@@ -14,9 +14,9 @@ Open the settings gear beside **Bank Filler Line Break** to adjust these options
 
 
 
-!\[Bank organized with filler line breaks using just blank row spacers](previewimg/preview1)
+!\[Bank organized with filler line breaks using just blank row spacers](previewimg/preview1.png)
 
 
 
-!\[Bank organized with filler line breaks using just indents](previewimg/preview2)
+!\[Bank organized with filler line breaks using just indents](previewimg/preview2.png)
 
