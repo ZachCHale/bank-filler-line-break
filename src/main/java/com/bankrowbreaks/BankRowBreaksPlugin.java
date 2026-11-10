@@ -65,7 +65,7 @@ public class BankRowBreaksPlugin extends Plugin
     {
         enabled = true;
         lastStatus = null;
-        log.info("Bank Filler Line Break 0.2.2 enabled");
+        log.info("Bank Filler Line Break 0.2.3 enabled");
         clientThread.invokeLater(bankSearch::layoutBank);
     }
 
@@ -139,16 +139,20 @@ public class BankRowBreaksPlugin extends Plugin
                 continue;
             }
             int index = child.getIndex();
-            if (child.getItemId() >= 0 && child.getItemId() != ItemID.BLANKOBJECT
-                && child.getOriginalHeight() == RowLayout.ITEM_HEIGHT)
+            boolean emptySlot = child.getItemId() == ItemID.BLANKOBJECT;
+            if (child.getItemId() >= 0 && child.getOriginalHeight() == RowLayout.ITEM_HEIGHT)
             {
                 // Skip synthetic/reordered widgets belonging to other layouts.
-                if (index < 0 || index >= bank.size() || bank.getItem(index) == null
-                    || bank.getItem(index).getId() != child.getItemId())
+                if (!emptySlot && (index < 0 || index >= bank.size() || bank.getItem(index) == null
+                    || bank.getItem(index).getId() != child.getItemId()))
                 {
                     status("Skipped: widget/bank mismatch at slot " + index);
                     return;
                 }
+                // The native bank leaves BLANKOBJECT widgets in vacated slots.
+                // Keep their geometry in the grid: dropping them makes the next
+                // item look like a new tab origin, pushing later columns right.
+                // Move the blank widgets too so they cannot overlap moved items.
                 items.add(child);
                 hasFiller |= child.getItemId() == ItemID.BANK_FILLER;
             }

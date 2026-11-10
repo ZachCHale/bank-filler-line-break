@@ -193,4 +193,49 @@ public class BankRowBreaksPluginTest
         verify(widgets[4]).setOriginalX(51);
         verify(widgets[4]).setOriginalY(72);
     }
+    private void emptySlot(int index)
+    {
+        when(widgets[index].getItemId()).thenReturn(ItemID.BLANKOBJECT);
+        when(client.getItemContainer(InventoryID.BANK).getItem(index)).thenReturn(null);
+    }
+
+    @Test public void releasedPlaceholderDoesNotStartANewSection()
+    {
+        emptySlot(4);
+        when(plugin.config.indent()).thenReturn(2);
+        when(plugin.config.indentTabs()).thenReturn(true);
+        fire(ScriptID.BANKMAIN_FINISHBUILDING);
+        verify(widgets[5]).setOriginalX(195);
+        verify(widgets[5]).setOriginalY(36);
+        verify(widgets[7]).setOriginalX(291);
+        // Empty slots must move with their row, not overlap another item.
+        verify(widgets[4]).setOriginalX(147);
+        verify(widgets[4]).setOriginalY(36);
+    }
+
+    @Test public void removingFirstItemPreservesLeftEdgeAndIndent()
+    {
+        emptySlot(0);
+        when(plugin.config.indent()).thenReturn(7);
+        when(plugin.config.indentAllItems()).thenReturn(true);
+        fire(ScriptID.BANKMAIN_FINISHBUILDING);
+        verify(widgets[1]).setOriginalX(51);
+        verify(widgets[1]).setOriginalY(36);
+        verify(widgets[4]).setOriginalX(387);
+        verify(widgets[5]).setOriginalX(51);
+    }
+
+    @Test public void multipleEmptySlotsPreserveBreakAndBlankRow()
+    {
+        emptySlot(1);
+        emptySlot(4);
+        emptySlot(6);
+        when(plugin.config.blankRow()).thenReturn(true);
+        fire(ScriptID.BANKMAIN_FINISHBUILDING);
+        verify(widgets[5]).setOriginalX(99);
+        verify(widgets[5]).setOriginalY(72);
+        verify(widgets[7]).setOriginalX(195);
+        verify(widgets[7]).setOriginalY(72);
+        assertEquals(108, stack[13]);
+    }
 }
